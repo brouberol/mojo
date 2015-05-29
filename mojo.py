@@ -126,6 +126,7 @@ def store_offers(job_offers):
 
 
 def main():
+    """Do the magic. \o/"""
     job_offers = extract_job_offers()
     new_job_offers = store_offers(job_offers)
     send_mail(new_job_offers)
