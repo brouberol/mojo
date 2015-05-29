@@ -3,14 +3,14 @@
 """
 Script scraping the Mozilla careers webpage, storing interesting
 job offfers in "database" (a JSON file), and sends daily email digest
-for any new job offers.
+containing the new job offers, if any.
 
 """
 
 import requests
 import json
-from urlparse import urljoin
 
+from urlparse import urljoin
 from os.path import exists, join, abspath, dirname
 from bs4 import BeautifulSoup
 
