@@ -121,7 +121,7 @@ def store_offers(job_offers):
         if job_offer['link'] not in seen_offers:
             new_job_offers.append(job_offer)
             seen_offers[job_offer['link']] = job_offer
-    json.dump(seen_offers, open(JOB_OFFERS_FILEPATH, 'w'))
+    json.dump(seen_offers, open(JOB_OFFERS_FILEPATH, 'w'), indent=2)
     return new_job_offers
 
 
