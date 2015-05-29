@@ -2,8 +2,8 @@
 
 """
 Script scraping the Mozilla careers webpage, storing interesting
-job offfers in database, and sends daily email digest for new job
-offers.
+job offfers in "database" (a JSON file), and sends daily email digest
+for any new job offers.
 
 """
 
@@ -43,7 +43,7 @@ def extract_job_offers():
     html = requests.get(BASE_URL, verify=False).text
     soup = BeautifulSoup(html)
     table = soup.find('table',   id='listings-positions')
-    for tr in table('tr', class_='position')[2:-1]:  # lasr one is hidden ans displays an error message
+    for tr in table('tr', class_='position')[2:-1]:  # last one is hidden ans displays an error message
         job_offer = {
             'title': tr.find('td', class_='title').text.strip(),
             'location': tr.find('td', class_='location').text.strip(),
