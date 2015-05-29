@@ -45,10 +45,10 @@ def extract_job_offers():
     table = soup.find('table',   id='listings-positions')
     for tr in table('tr', class_='position')[2:-1]:  # lasr one is hidden ans displays an error message
         job_offer = {
-            'title': tr.find('td', class_='title').text,
-            'location': tr.find('td', class_='location').text,
-            'position': tr.find('td', class_='type').text,
-            'team': tr.find('td', class_='name').text,
+            'title': tr.find('td', class_='title').text.strip(),
+            'location': tr.find('td', class_='location').text.strip(),
+            'position': tr.find('td', class_='type').text.strip(),
+            'team': tr.find('td', class_='name').text.strip(),
             'link': tr.find('td', class_='title').find('a').attrs['href'],
         }
         if include_job_offer(job_offer):
