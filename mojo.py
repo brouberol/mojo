@@ -25,6 +25,7 @@ SELECTORS = {
 
 
 def include_job_offer(job_offer):
+    """Return True if the job_offer is of interest, else False."""
     for k, v in job_offer.iteritems():
         if k in SELECTORS and v in SELECTORS[k]:
             return True
