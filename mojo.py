@@ -9,19 +9,26 @@ offers.
 
 import requests
 import json
-import os
 from urlparse import urljoin
 
 from os.path import exists, join, abspath, dirname
 from bs4 import BeautifulSoup
 
 
-API_KEY = os.environ['MAILGUN_API_KEY']
-MAILGUN_DOMAIN = os.environ['MAILGUN_DOMAIN']
-MAILGUN_URL = "https://api.mailgun.net/v2/%s/messages" % (MAILGUN_DOMAIN)
-BASE_URL = 'https://careers.mozilla.org/en-US/listings/'
+API_KEY = 'key-24ca5cd44ab8f098e2db81f44c486f1d'
+MAILGUN_URL = 'https://api.mailgun.net/v3/mg.balthazar-rouberol.com/messages'
+BASE_URL = 'http://careers.mozilla.org/en-US/listings'
 JOB_OFFERS_FILEPATH = abspath(join(dirname(__file__), 'offers.json'))
-SELECTORS = ['Engineering', 'IT']
+SELECTORS = {
+    'team': ['Engineering', 'IT'],
+}
+
+
+def include_job_offer(job_offer):
+    for k, v in job_offer.iteritems():
+        if k in SELECTORS and v in SELECTORS[k]:
+            return True
+    return False
 
 
 def extract_job_offers():
@@ -32,9 +39,9 @@ def extract_job_offers():
 
     """
     job_offers = []
-    html = requests.get(BASE_URL).text
+    html = requests.get(BASE_URL, verify=False).text
     soup = BeautifulSoup(html)
-    table = soup.find('table', id='listings-positions')
+    table = soup.find('table',   id='listings-positions')
     for tr in table('tr', class_='position')[2:-1]:  # lasr one is hidden ans displays an error message
         job_offer = {
             'title': tr.find('td', class_='title').text,
@@ -43,9 +50,9 @@ def extract_job_offers():
             'team': tr.find('td', class_='name').text,
             'link': tr.find('td', class_='title').find('a').attrs['href'],
         }
-        if job_offer['team'] in SELECTORS:
+        if include_job_offer(job_offer):
             job_offer['link'] = urljoin(BASE_URL, job_offer['link'])
-            job_html = requests.get(job_offer['link']).text
+            job_html = requests.get(job_offer['link'], verify=False).text
             job_soup = BeautifulSoup(job_html)
             job_offer['description'] = job_soup.find('div', class_='job-post-description').text
             job_offers.append(job_offer)
@@ -55,12 +62,15 @@ def extract_job_offers():
 
 def format_job_offer(job_offer):
     return u"""
-<p><a href="{link}>{title}</a></p>
+<hr/>
+<p><a href="{link}">{title}</a></p>
 
- <p>
-    TEAM: {team}
-    LOCATIONS: {location}
-    POSITION: {position}
+<p>
+    <ul>
+        <li>TEAM: {team}</li>
+        <li>LOCATIONS: {location}</li>
+        <li>POSITION: {position}</li>
+    </ul>
 </p>
 <p>
     DESCRIPTION: {description}
@@ -69,19 +79,22 @@ def format_job_offer(job_offer):
         link=job_offer['link'],
         title=job_offer['title'],
         team=job_offer['team'],
-        location=job_offer['locatione'],
+        location=job_offer['location'],
         position=job_offer['position'],
-        description=' '.join(job_offer['description'].split(' ')[:150]))
+        description=' '.join(job_offer['description'].split(' ')[:150]) + '...')
 
 
-def send_mail(job_offers):
+def send_mail(new_job_offers):
     """Send an HTML formatted email digest, listing current open job
     offers of interest.
 
     """
-    formatted_offers = ''.join([format_job_offer(offer) for offer in job_offers])
+    if not new_job_offers:
+        return
+
+    formatted_offers = ''.join([format_job_offer(offer) for offer in new_job_offers])
     text = u"""
-Here are new job offers found on {base_url}:
+<p>Here are new job offers found on <a href="{base_url}">{base_url}</a>.</p>
 {offers}""".format(base_url=BASE_URL, offers=formatted_offers)
     return requests.post(
         MAILGUN_URL,
@@ -89,13 +102,15 @@ Here are new job offers found on {base_url}:
         data = {
             "from": "mojo@imap.cc",
             "to": "br@imap.cc",
-            "subject": "[Mojo] - %d new positon%s found" % (len(job_offers), 's' if len(job_offers) > 1 else ''),
-            "text": text
+            "subject": "[Mojo] - %d new positon%s found" % (
+                len(new_job_offers), 's' if len(new_job_offers) > 1 else ''),
+            "html": text
         })
 
 
 def store_offers(job_offers):
     """Add the argument job offers into the seen job offers database."""
+    new_job_offers = []
     if not exists(JOB_OFFERS_FILEPATH):
         seen_offers = {}
     else:
@@ -103,21 +118,19 @@ def store_offers(job_offers):
 
     for job_offer in job_offers:
         if job_offer['link'] not in seen_offers:
+            new_job_offers.append(job_offer)
             seen_offers[job_offer['link']] = job_offer
     json.dump(seen_offers, open(JOB_OFFERS_FILEPATH, 'w'))
+    return new_job_offers
 
 
 def main():
     job_offers = extract_job_offers()
-    store_offers(job_offers)
-    send_mail(job_offers)
+    new_job_offers = store_offers(job_offers)
+    send_mail(new_job_offers)
 
 
 if __name__ == '__main__':
     main()
 
-
-# TODO: fix mailgun DNS and MX records
-# TODO: let it propagate
-# TODO: add this in a crontab on pi
 # TODO: get hired
