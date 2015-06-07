@@ -110,7 +110,7 @@ def send_mail(new_job_offers, api_key, api_url, send_to):
         data = {
             "from": "mojo@imap.cc",
             "to": send_to,
-            "subject": "[Mojo] - %d new positon%s found" % (
+            "subject": "[Mojo] - %d new position%s found" % (
                 len(new_job_offers), 's' if len(new_job_offers) > 1 else ''),
             "html": text
         })
