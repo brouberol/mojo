@@ -17,12 +17,24 @@ Example: ``SELECTORS = {'team': ['Engineering', 'IT']}`` will only select positi
 - link
 - description
 
+```
+usage: mojo.py [-h] --api-key API_KEY --api-url API_URL --send-to SEND_TO
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --api-key API_KEY, -k API_KEY
+                        The mailgun API_KEY
+  --api-url API_URL, -u API_URL
+                        The mailgun API URL
+  --send-to SEND_TO, -t SEND_TO
+                        The email address new positions will be sent to
+```
+
 I run this script daily using a cron job, but you're free to do it however you fancy.
 
 ## Email sending
 
 This script relies on Mailgun to actually send the email, because I'm lazy and I initially hacked this in a train.
-You need to populate the ``MAILGUN_API_KEY`` and ``MAILGUN_URL`` environment variables before running the script.
 
 ## License
 
