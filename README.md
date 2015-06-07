@@ -22,6 +22,7 @@ I run this script daily using a cron job, but you're free to do it however you f
 ## Email sending
 
 This script relies on Mailgun to actually send the email, because I'm lazy and I initially hacked this in a train.
+You need to populate the ``MAILGUN_API_KEY`` and ``MAILGUN_URL`` environment variables before running the script.
 
 ## License
 
