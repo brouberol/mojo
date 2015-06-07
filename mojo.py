@@ -7,6 +7,7 @@ containing the new job offers, if any.
 
 """
 
+import os
 import requests
 import json
 
@@ -15,8 +16,8 @@ from os.path import exists, join, abspath, dirname
 from bs4 import BeautifulSoup
 
 
-API_KEY = 'key-24ca5cd44ab8f098e2db81f44c486f1d'
-MAILGUN_URL = 'https://api.mailgun.net/v3/mg.balthazar-rouberol.com/messages'
+API_KEY = os.environ['MAILGUN_API_KEY']
+MAILGUN_URL = os.environ['MAILGUN_URL']
 BASE_URL = 'http://careers.mozilla.org/en-US/listings'
 JOB_OFFERS_FILEPATH = abspath(join(dirname(__file__), 'offers.json'))
 SELECTORS = {
@@ -42,7 +43,7 @@ def extract_job_offers():
     job_offers = []
     html = requests.get(BASE_URL, verify=False).text
     soup = BeautifulSoup(html)
-    table = soup.find('table',   id='listings-positions')
+    table = soup.find('table', id='listings-positions')
     for tr in table('tr', class_='position')[2:-1]:  # last one is hidden ans displays an error message
         job_offer = {
             'title': tr.find('td', class_='title').text.strip(),
