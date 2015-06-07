@@ -1,6 +1,6 @@
 ## Mojo: Mozilla Jobs
 
-Get notified by email when a new position of interest open at Mozilla.
+Get notified by email when new positions of interest open up at Mozilla.
 
 This script scrapes job offers details from the [Mozilla career page](http://careers.mozilla.org/en-US/listings), and alerts by email you when a new position opens.
 
