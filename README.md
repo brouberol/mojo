@@ -32,6 +32,8 @@ optional arguments:
 
 I run this script daily using a cron job, but you're free to do it however you fancy.
 
+Note: mojo is compatible with python 2.6 to 3.4.
+
 ## Email sending
 
 This script relies on Mailgun to actually send the email, because I'm lazy and I initially hacked this in a train.
