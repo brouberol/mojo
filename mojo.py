@@ -38,6 +38,7 @@ def parse_args():
     parser.add_argument('--api-key', '-k', help='The mailgun API_KEY', required=True)
     parser.add_argument('--api-url', '-u', help='The mailgun API URL', required=True)
     parser.add_argument('--send-to', '-t', help='The email address new positions will be sent to', required=True)
+    parser.add_argument('--send-from', '-f', help='The email address new positions will be sent from', required=True)
     return parser.parse_args()
 
 
@@ -102,7 +103,7 @@ def format_job_offer(job_offer):
         description=' '.join(job_offer['description'].split(' ')[:150]) + '...')
 
 
-def send_mail(new_job_offers, api_key, api_url, send_to):
+def send_mail(new_job_offers, api_key, api_url, send_to, send_from):
     """Send an HTML formatted email digest, listing current open job
     offers of interest.
 
@@ -118,7 +119,7 @@ def send_mail(new_job_offers, api_key, api_url, send_to):
         api_url,
         auth=("api", api_key),
         data = {
-            "from": "mojo@mozilla.org",
+            "from": send_from,
             "to": send_to,
             "subject": "[Mojo] - %d new position%s found" % (
                 len(new_job_offers), 's' if len(new_job_offers) > 1 else ''),
@@ -147,7 +148,12 @@ def main():
     args = parse_args()
     job_offers = extract_job_offers()
     new_job_offers = store_offers(job_offers)
-    send_mail(new_job_offers, api_key=args.api_key, api_url=args.api_url, send_to=args.send_to)
+    send_mail(
+        new_job_offers,
+        api_key=args.api_key,
+        api_url=args.api_url,
+        send_to=args.send_to,
+        send_from=args.send_from)
 
 
 if __name__ == '__main__':
