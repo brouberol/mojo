@@ -118,7 +118,7 @@ def send_mail(new_job_offers, api_key, api_url, send_to):
         api_url,
         auth=("api", api_key),
         data = {
-            "from": "mojo@imap.cc",
+            "from": "mojo@mozilla.org",
             "to": send_to,
             "subject": "[Mojo] - %d new position%s found" % (
                 len(new_job_offers), 's' if len(new_job_offers) > 1 else ''),
