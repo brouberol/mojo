@@ -22,8 +22,8 @@ from bs4 import BeautifulSoup
 
 
 # http://careers.mozilla.org/en-US/listings redirects to https://careers.mozilla.org/en-US/listings
-# and a requests.get on https://careers.mozilla.org/en-US/listings will
-# raise a requests.exceptions.SSLError exception, but only when using Python2
+# and a requests.get on https://careers.mozilla.org/en-US/listings when verigying the certificate
+# will raise a requests.exceptions.SSLError exception, but only when using Python2
 SSL_VERIFY = py_version.major == 3
 
 BASE_URL = 'http://careers.mozilla.org/en-US/listings'
