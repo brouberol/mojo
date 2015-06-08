@@ -6,15 +6,25 @@ job offfers in "database" (a JSON file), and sends daily email digest
 containing the new job offers, if any.
 
 """
+import sys
+py_version = sys.version_info
 
 import argparse
 import requests
 import json
 
-from urlparse import urljoin
+if py_version.major == 3:
+    from urllib.parse import urljoin
+else:
+    from urlparse import urljoin
 from os.path import exists, join, abspath, dirname
 from bs4 import BeautifulSoup
 
+
+# http://careers.mozilla.org/en-US/listings redirects to https://careers.mozilla.org/en-US/listings
+# and a requests.get on https://careers.mozilla.org/en-US/listings will
+# raise a requests.exceptions.SSLError exception, but only when using Python2
+SSL_VERIFY = py_version.major == 3
 
 BASE_URL = 'http://careers.mozilla.org/en-US/listings'
 JOB_OFFERS_FILEPATH = abspath(join(dirname(__file__), 'offers.json'))
@@ -33,7 +43,7 @@ def parse_args():
 
 def include_job_offer(job_offer):
     """Return True if the job_offer is of interest, else False."""
-    for k, v in job_offer.iteritems():
+    for k, v in job_offer.items():
         if k in SELECTORS and v in SELECTORS[k]:
             return True
     return False
@@ -47,7 +57,7 @@ def extract_job_offers():
 
     """
     job_offers = []
-    html = requests.get(BASE_URL, verify=False).text
+    html = requests.get(BASE_URL, verify=SSL_VERIFY).text
     soup = BeautifulSoup(html)
     table = soup.find('table', id='listings-positions')
     for tr in table('tr', class_='position')[2:-1]:  # last one is hidden ans displays an error message
@@ -60,7 +70,7 @@ def extract_job_offers():
         }
         if include_job_offer(job_offer):
             job_offer['link'] = urljoin(BASE_URL, job_offer['link'])
-            job_html = requests.get(job_offer['link'], verify=False).text
+            job_html = requests.get(job_offer['link'], verify=SSL_VERIFY).text
             job_soup = BeautifulSoup(job_html)
             job_offer['description'] = job_soup.find('div', class_='job-post-description').text
             job_offers.append(job_offer)
