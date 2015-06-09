@@ -19,6 +19,7 @@ Example: ``SELECTORS = {'team': ['Engineering', 'IT']}`` will only select positi
 
 ```
 usage: mojo.py [-h] --api-key API_KEY --api-url API_URL --send-to SEND_TO
+               --send-from SEND_FROM
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -28,6 +29,9 @@ optional arguments:
                         The mailgun API URL
   --send-to SEND_TO, -t SEND_TO
                         The email address new positions will be sent to
+  --send-from SEND_FROM, -f SEND_FROM
+                        The email address new positions will be sent from
+
 ```
 
 I run this script daily using a cron job, but you're free to do it however you fancy.
