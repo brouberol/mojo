@@ -9,6 +9,7 @@ containing the new job offers, if any.
 import sys
 py_version = sys.version_info
 
+import logging
 import argparse
 import requests
 import json
@@ -31,6 +32,13 @@ JOB_OFFERS_FILEPATH = abspath(join(dirname(__file__), 'offers.json'))
 SELECTORS = {
     'team': ['Engineering', 'IT'],
 }
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+ch = logging.StreamHandler(stream=sys.stdout)
+ch.setLevel(logging.INFO)
+ch.setFormatter(formatter)
+LOG.addHandler(ch)
 
 
 def parse_args():
@@ -146,8 +154,10 @@ def store_offers(job_offers):
 def main():
     """Where all the magic happens"""
     args = parse_args()
+    LOG.info('Scraping for new job offers...')
     job_offers = extract_job_offers()
     new_job_offers = store_offers(job_offers)
+    LOG.info('%d new job offers found', len(new_job_offers))
     send_mail(
         new_job_offers,
         api_key=args.api_key,

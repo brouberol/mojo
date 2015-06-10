@@ -34,7 +34,12 @@ optional arguments:
 
 ```
 
-I run this script daily using a cron job, but you're free to do it however you fancy.
+I run this script daily using a cron job, with the following command:
+
+```bash
+python mojo.py --api-key MY_API_KEY --api-url MY_API_URL --send-from mojo@imap.cc --send-to br@imap.cc >> mojo.log
+```
+
 
 Note: mojo is compatible with python 2.6 to 3.4.
 
