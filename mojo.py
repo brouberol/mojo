@@ -123,7 +123,7 @@ def send_mail(new_job_offers, api_key, api_url, send_to, send_from):
     text = u"""
 <p>Here are new job offers found on <a href="{base_url}">{base_url}</a>.</p>
 {offers}""".format(base_url=BASE_URL, offers=formatted_offers)
-    return requests.post(
+    r = requests.post(
         api_url,
         auth=("api", api_key),
         data = {
@@ -133,6 +133,8 @@ def send_mail(new_job_offers, api_key, api_url, send_to, send_from):
                 len(new_job_offers), 's' if len(new_job_offers) > 1 else ''),
             "html": text
         })
+    r.raise_for_status()
+    return r
 
 
 def store_offers(job_offers):
@@ -158,12 +160,15 @@ def main():
     job_offers = extract_job_offers()
     new_job_offers = store_offers(job_offers)
     LOG.info('%d new job offers found', len(new_job_offers))
-    send_mail(
-        new_job_offers,
-        api_key=args.api_key,
-        api_url=args.api_url,
-        send_to=args.send_to,
-        send_from=args.send_from)
+    try:
+        send_mail(
+            new_job_offers,
+            api_key=args.api_key,
+            api_url=args.api_url,
+            send_to=args.send_to,
+            send_from=args.send_from)
+    except Exception as exc:
+        LOG.exception(exc)
 
 
 if __name__ == '__main__':
